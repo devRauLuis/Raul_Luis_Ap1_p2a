@@ -1,0 +1,203 @@
+@page "/registro"
+@page "/registro/{ProductoId:int}"
+@inject IToastService toastService
+@inject ILogger<Registro> logger
+
+<PageTitle>Registro</PageTitle>
+
+
+<EditForm Model="producto" OnValidSubmit="@Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="card shadow-lg">
+        <div class="card-header">
+            <h1 class="card-title">Registro de productos</h1>
+        </div>
+        <div class="card-body">
+            <div class="list-group-item">
+                <div class="form-row align-items-center">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Producto Id</label>
+                            <div class="input-group">
+                                <InputNumber @bind-Value="ProductoId" class="form-control col-4" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary input-group-text" @onclick="BuscarClick">
+                                        Buscar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group mt-3">
+                    <label for="descripcion" class="form-label">Descripci&oacute;n</label>
+                    <InputText id="descripcion" @bind-Value="producto.Descripcion" class="form-control" />
+                    <ValidationMessage For="@(() => producto.Descripcion)" />
+                </div>
+                <div class="form-group mt-3">
+                    <label for="existencia" class="form-label">Existencia</label>
+                    <InputNumber id="existencia" class="form-control" @bind-Value="producto.Existencia" />
+                    <ValidationMessage For="@(() => producto.Existencia)" />
+                </div>
+                <div class="form-group mt-3">
+                    <label for="costo" class="form-label">Costo</label>
+                    <InputNumber id="costo" class="form-control" @bind-Value="producto.Costo" step="0.01" />
+                    <ValidationMessage For="@(() => producto.Costo)" />
+                </div>
+                <div class="form-group mt-3">
+                    <label for="valor-inventario" class="form-label">Valor Inventario</label>
+                    <InputNumber id="valor-inventario" class="form-control" @bind-Value="producto.ValorInventario"
+                        step="0.01" disabled />
+                </div>
+                <div class="form-group mt-3">
+                    <label for="ganancia" class="form-label">Ganancia</label>
+                    <div class="input-group">
+                        <InputNumber id="ganancia" class="form-control" @bind-Value="producto.Ganancia" />
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <ValidationMessage For="@(() => producto.Ganancia)" />
+                </div>
+                <div class="form-group mt-3">
+                    <label for="precio" class="form-label">Precio</label>
+                    <InputNumber id="precio" class="form-control" @bind-Value="producto.Precio" step="0.01" />
+                    <ValidationMessage For="@(() => producto.Precio)" />
+                </div>
+            </div>
+
+            <div class="list-group-item pt-4 pb-3">
+
+                <h3 class="">Presentaciones del producto</h3>
+
+                <div class="input-group gap-5 mt-3">
+                    <div class="">
+                        <label for="presentacion" class='form-label'>Descripción</label>
+                        <InputText id="presentacion" class="form-control"
+                            @bind-Value='nuevoProductoDetalles.Presentacion' />
+                    </div>
+                    <div class="">
+                        <label for="cantidad" class='form-label'>Cantidad</label>
+                        <InputNumber id="cantidad" class="form-control" @bind-Value='nuevoProductoDetalles.Cantidad' />
+                    </div>
+                    <div class="">
+                        <label for="precio" class='form-label'>Precio</label>
+                        <InputNumber id="precio" class="form-control" @bind-Value='nuevoProductoDetalles.Precio' />
+                    </div>
+                </div>
+                <button class="btn btn-primary mt-3" @onclick="AgregarProductoDetalles">Agregar Detalle</button>
+                <table class="table table-bordered table-light table-striped mt-3">
+                    <thead>
+                        <tr>
+                            <th>Presentacion</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (producto.ProductoDetalles is not null)
+                        {
+                            @foreach (var detalles in this.producto.ProductoDetalles)
+                            {
+                                <tr>
+                                    <td>
+                                        @detalles.Presentacion
+                                    </td>
+                                    <td>
+                                        @detalles.Cantidad
+                                    </td>
+                                    <td>
+                                        @detalles.Precio
+                                    </td>
+
+                                    <td>
+                                        <span class="oi oi-trash text-primary me-2 mx-auto" aria-hidden='true' title='delete'
+                                    @onclick='args => logger.LogInformation(detalles.ProductoDetallesId + "")' />
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-footer">
+                <button class="btn btn-primary mt-4" @onclick="Nuevo">Nuevo</button>
+                <button class="btn btn-success mt-4" type='submit'>Guardar</button>
+                <button class="btn btn-danger mt-4" @onclick="Eliminar">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public int ProductoId { get; set; }
+
+    [Inject]
+    public ProductosBLL? productosBLL { get; set; }
+    public Productos producto { get; set; } = new Productos();
+
+    public ProductoDetalles? nuevoProductoDetalles { get; set; } = new ProductoDetalles();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Buscar(this.ProductoId);
+    }
+
+    public void Nuevo()
+    {
+        this.producto = new Productos();
+        this.ProductoId = 0;
+    }
+    public void Guardar()
+    {
+        CalcularValorExistencia();
+        productosBLL.Guardar(producto);
+    }
+
+    public void BuscarClick()
+    {
+        Buscar(this.producto.ProductoId);
+    }
+
+    public void Buscar(int id)
+    {
+        if (id > 0)
+        {
+            var encontrado = productosBLL.Buscar(id);
+            if (encontrado is not null)
+            {
+                this.producto = encontrado;
+            }
+            else
+            {
+                toastService.ShowError("No se ha encontrado el producto!");
+                this.producto = new Productos();
+            }
+        }
+    }
+
+    public void Eliminar()
+    {
+        bool eliminado = productosBLL.Eliminar(producto.ProductoId);
+        if (eliminado)
+        {
+            Nuevo();
+        }
+        else toastService.ShowError("Ocurrió un error al eliminar!");
+
+    }
+
+    public void CalcularValorExistencia()
+    {
+        this.producto.ValorInventario = (float)producto.Existencia * producto.Costo;
+    }
+
+    public void AgregarProductoDetalles()
+    {
+        this.producto.ProductoDetalles.Add(nuevoProductoDetalles);
+    }
+
+}
