@@ -21,7 +21,7 @@ public class Productos
     public float Costo { get; set; }
 
     [Required]
-    [Range(0, float.MaxValue, ErrorMessage = "El costo debe ser mayor a {1} y menor a {2}")]
+    [Range(0, float.MaxValue, ErrorMessage = "El valor inventario debe ser mayor a {1} y menor a {2}")]
     public float ValorInventario { get; set; }
 
     [Required]
@@ -29,7 +29,7 @@ public class Productos
     public float Precio { get; set; }
 
     [Required]
-    [Range(0.01, 100, ErrorMessage = "La ganancia debe ser mayor a {1} y menor a {2}")]
+    [Range(0, 100, ErrorMessage = "La ganancia debe ser mayor a {1} y menor a {2}")]
     public float Ganancia { get; set; }
 
     [ForeignKey("ProductoId")]
