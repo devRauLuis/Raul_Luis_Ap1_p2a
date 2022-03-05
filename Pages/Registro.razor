@@ -50,18 +50,21 @@
                     <InputNumber id="valor-inventario" class="form-control" @bind-Value="producto.ValorInventario"
                         step="0.01" disabled />
                 </div>
-                <div class="form-group mt-3">
-                    <label for="ganancia" class="form-label">Ganancia</label>
-                    <div class="input-group">
-                        <InputNumber id="ganancia" class="form-control" @bind-Value="producto.Ganancia" />
-                        <span class="input-group-text">%</span>
-                    </div>
-                    <ValidationMessage For="@(() => producto.Ganancia)" />
-                </div>
+
                 <div class="form-group mt-3">
                     <label for="precio" class="form-label">Precio</label>
                     <InputNumber id="precio" class="form-control" @bind-Value="producto.Precio" step="0.01" />
                     <ValidationMessage For="@(() => producto.Precio)" />
+
+                    <div class="form-group mt-3">
+                        <label for="ganancia" class="form-label">Ganancia</label>
+                        <div class="input-group">
+                            <InputNumber id="ganancia" class="form-control" @bind-Value="producto.Ganancia" step="0.01"
+                                disabled />
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <ValidationMessage For="@(() => producto.Ganancia)" />
+                    </div>
                 </div>
             </div>
 
@@ -153,6 +156,7 @@
     }
     public void Guardar()
     {
+        CalcularGanancia();
         CalcularValorExistencia();
         productosBLL.Guardar(producto);
     }
@@ -193,6 +197,12 @@
     public void CalcularValorExistencia()
     {
         this.producto.ValorInventario = (float)producto.Existencia * producto.Costo;
+    }
+
+    public void CalcularGanancia()
+    {
+        this.producto.Ganancia = ((float)(this.producto.Precio * 100) / this.producto.Costo) - 100;
+
     }
 
     public void AgregarProductoDetalles()
