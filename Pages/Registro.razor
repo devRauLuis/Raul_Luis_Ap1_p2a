@@ -131,8 +131,8 @@
                                         @detalles.Precio
                                     </td>
                                     <td>
-                                        <span class="oi oi-pencil me-2 mx-auto" aria-hidden='true' title='edit'
-                                    @onclick='args => productoDetallesActual=detalles' />
+                                        @* <span class="oi oi-pencil me-2 mx-auto" aria-hidden='true' title='edit'
+                                            @onclick='args => productoDetallesActual=detalles' /> *@
                                         <span class="oi oi-trash text-danger mx-auto" aria-hidden='true' title='delete'
                                     @onclick='args => EliminarDetalle(detalles.ProductoDetallesId)' />
                                     </td>
@@ -189,11 +189,11 @@
         Buscar(this.producto.ProductoId);
     }
 
-    public void Buscar(int id)
+    public async void Buscar(int id)
     {
         if (id > 0)
         {
-            var encontrado = productosBLL.Buscar(id);
+            var encontrado = await productosBLL.Buscar(id);
             if (encontrado is not null)
             {
                 this.producto = encontrado;
@@ -212,9 +212,9 @@
         }
     }
 
-    public void Eliminar()
+    public async void Eliminar()
     {
-        bool eliminado = productosBLL.Eliminar(producto.ProductoId);
+        bool eliminado = await productosBLL.Eliminar(producto.ProductoId);
         if (eliminado)
         {
             Nuevo();
@@ -253,6 +253,6 @@
     public void CalcularPrecioDetalle()
     {
         if (this.productoDetallesActual.Cantidad > 0)
-            this.productoDetallesActual.Precio = (float)this.productoDetallesActual.Cantidad * this.producto.Costo;
+            this.productoDetallesActual.Precio = (float)this.productoDetallesActual.Cantidad * this.producto.Precio;
     }
 }
