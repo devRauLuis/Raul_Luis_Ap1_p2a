@@ -19,5 +19,9 @@ public class ProductoDetalles
     [Required]
     [Range(0, float.MaxValue, ErrorMessage = "El precio debe ser mayor a {1} y menor a {2}")]
     public float? Precio { get; set; }
-    public int ProductoId { get; set; }
+    public Productos Producto { get; set; }
+
+
+
+
 }

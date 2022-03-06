@@ -35,7 +35,7 @@ public class Productos
     [DataType(DataType.Date)]
     public DateTime FechaExpiracion { get; set; } = DateTime.Now;
 
-    [ForeignKey("ProductoId")]
-    public virtual List<ProductoDetalles> ProductoDetalles { get; set; } = new List<ProductoDetalles>();
+    // [ForeignKey("ProductoId")]
+    public ICollection<ProductoDetalles> ProductoDetalles { get; set; }
 
 }
