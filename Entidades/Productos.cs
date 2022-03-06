@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
 namespace ProductsBlazor.Entidades;
 public class Productos
 {
@@ -29,8 +28,12 @@ public class Productos
     public float Precio { get; set; }
 
     [Required]
-    [Range(0, 100, ErrorMessage = "La ganancia debe ser mayor a {1} y menor a {2}")]
+    [Range(float.MinValue, float.MaxValue, ErrorMessage = "La ganancia debe ser mayor a {1} y menor a {2}")]
     public float Ganancia { get; set; }
+
+    [Required]
+    [DataType(DataType.Date)]
+    public DateTime FechaExpiracion { get; set; } = DateTime.Now;
 
     [ForeignKey("ProductoId")]
     public virtual List<ProductoDetalles> ProductoDetalles { get; set; } = new List<ProductoDetalles>();
