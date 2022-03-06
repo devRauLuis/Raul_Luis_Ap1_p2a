@@ -14,19 +14,15 @@
             <h1 class="card-title">Registro de productos</h1>
         </div>
         <div class="card-body">
-            <div class="list-group-item">
-                <div class="form-row align-items-center">
-                    <div class="col">
-                        <div class="form-group">
-                            <label>Producto Id</label>
-                            <div class="input-group">
-                                <InputNumber @bind-Value="ProductoId" class="form-control col-4" />
-                                <div class="input-group-append">
-                                    <button class="btn btn-primary input-group-text" @onclick="BuscarClick">
-                                        Buscar
-                                    </button>
-                                </div>
-                            </div>
+            <div class="list-group-item pb-3">
+                <div class="form-group col-3">
+                    <label>Producto Id</label>
+                    <div class="input-group">
+                        <InputNumber @bind-Value="ProductoId" class="form-control col-4" />
+                        <div class="input-group-append">
+                            <button class="btn btn-primary input-group-text" @onclick="BuscarClick">
+                                Buscar
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -35,28 +31,35 @@
                     <InputText id="descripcion" @bind-Value="producto.Descripcion" class="form-control" />
                     <ValidationMessage For="@(() => producto.Descripcion)" />
                 </div>
-                <div class="form-group mt-3">
-                    <label for="existencia" class="form-label">Existencia</label>
-                    <InputNumber id="existencia" class="form-control" @bind-Value="producto.Existencia" />
-                    <ValidationMessage For="@(() => producto.Existencia)" />
+                <div class="row">
+                    <div class="form-group mt-3 col-3">
+                        <label for="existencia" class="form-label">Existencia</label>
+                        <InputNumber id="existencia" class="form-control" @bind-Value="producto.Existencia"
+                            @onblur='CalcularValorInventario' />
+                        <ValidationMessage For="@(() => producto.Existencia)" />
+                    </div>
+                    <div class="form-group mt-3 col-3">
+                        <label for="costo" class="form-label">Costo</label>
+                        <InputNumber id="costo" class="form-control" @bind-Value="producto.Costo" step="0.01"
+                            @onblur='CalcularValorInventario' />
+                        <ValidationMessage For="@(() => producto.Costo)" />
+                    </div>
+                    <div class="form-group mt-3 col-3">
+                        <label for="valor-inventario" class="form-label">Valor Inventario</label>
+                        <InputNumber id="valor-inventario" class="form-control" @bind-Value="producto.ValorInventario"
+                            step="0.01" disabled />
+                    </div>
                 </div>
-                <div class="form-group mt-3">
-                    <label for="costo" class="form-label">Costo</label>
-                    <InputNumber id="costo" class="form-control" @bind-Value="producto.Costo" step="0.01" />
-                    <ValidationMessage For="@(() => producto.Costo)" />
-                </div>
-                <div class="form-group mt-3">
-                    <label for="valor-inventario" class="form-label">Valor Inventario</label>
-                    <InputNumber id="valor-inventario" class="form-control" @bind-Value="producto.ValorInventario"
-                        step="0.01" disabled />
-                </div>
+                <div class="row">
 
-                <div class="form-group mt-3">
-                    <label for="precio" class="form-label">Precio</label>
-                    <InputNumber id="precio" class="form-control" @bind-Value="producto.Precio" step="0.01" />
-                    <ValidationMessage For="@(() => producto.Precio)" />
+                    <div class="form-group mt-3 col-3">
+                        <label for="precio" class="form-label">Precio</label>
+                        <InputNumber id="precio" class="form-control" @bind-Value="producto.Precio" step="0.01"
+                            @onblur="CalcularGanancia" />
+                        <ValidationMessage For="@(() => producto.Precio)" />
+                    </div>
 
-                    <div class="form-group mt-3">
+                    <div class="form-group mt-3 col-3">
                         <label for="ganancia" class="form-label">Ganancia</label>
                         <div class="input-group">
                             <InputNumber id="ganancia" class="form-control" @bind-Value="producto.Ganancia" step="0.01"
@@ -64,6 +67,15 @@
                             <span class="input-group-text">%</span>
                         </div>
                         <ValidationMessage For="@(() => producto.Ganancia)" />
+                    </div>
+
+                    <div class="form-group mt-3 col-3">
+                        <label for="ganancia" class="form-label">Fecha Expiraci&oacute;n</label>
+                        <div class="input-group">
+                            <InputDate id="fecha-expiracion" class="form-control"
+                                @bind-Value="producto.FechaExpiracion" />
+                        </div>
+                        <ValidationMessage For="@(() => producto.FechaExpiracion)" />
                     </div>
                 </div>
             </div>
@@ -77,14 +89,20 @@
                         <label for="presentacion" class='form-label'>Descripción</label>
                         <InputText id="presentacion" class="form-control"
                             @bind-Value='nuevoProductoDetalles.Presentacion' />
+                        <ValidationMessage For="@(() => nuevoProductoDetalles.Presentacion)" />
+
                     </div>
                     <div class="">
                         <label for="cantidad" class='form-label'>Cantidad</label>
-                        <InputNumber id="cantidad" class="form-control" @bind-Value='nuevoProductoDetalles.Cantidad' />
+                        <InputNumber id="cantidad" class="form-control" @bind-Value='nuevoProductoDetalles.Cantidad'
+                            @onblur='CalcularPrecioDetalle' />
+                        <ValidationMessage For="@(() => nuevoProductoDetalles.Cantidad)" />
                     </div>
                     <div class="">
                         <label for="precio" class='form-label'>Precio</label>
-                        <InputNumber id="precio" class="form-control" @bind-Value='nuevoProductoDetalles.Precio' />
+                        <InputNumber disabled id="precio" class="form-control"
+                            @bind-Value='nuevoProductoDetalles.Precio' />
+                        <ValidationMessage For="@(() => nuevoProductoDetalles.Precio)" />
                     </div>
                 </div>
                 <button class="btn btn-primary mt-3" @onclick="AgregarProductoDetalles">Agregar Detalle</button>
@@ -114,7 +132,7 @@
 
                                     <td>
                                         <span class="oi oi-trash text-primary me-2 mx-auto" aria-hidden='true' title='delete'
-                                    @onclick='args => logger.LogInformation(detalles.ProductoDetallesId + "")' />
+                                    @onclick='args => EliminarDetalle(detalles.ProductoDetallesId)' />
                                     </td>
                                 </tr>
                             }
@@ -157,8 +175,10 @@
     public void Guardar()
     {
         CalcularGanancia();
-        CalcularValorExistencia();
-        productosBLL.Guardar(producto);
+        CalcularValorInventario();
+        if (productosBLL.Guardar(producto)) toastService.ShowSuccess("Guardado con éxito");
+        else toastService.ShowError("Ocurrió un error al guardar");
+
     }
 
     public void BuscarClick()
@@ -189,12 +209,13 @@
         if (eliminado)
         {
             Nuevo();
+            toastService.ShowSuccess("Eliminado con éxito");
         }
         else toastService.ShowError("Ocurrió un error al eliminar!");
 
     }
 
-    public void CalcularValorExistencia()
+    public void CalcularValorInventario()
     {
         this.producto.ValorInventario = (float)producto.Existencia * producto.Costo;
     }
@@ -207,7 +228,22 @@
 
     public void AgregarProductoDetalles()
     {
+        if (nuevoProductoDetalles.Precio is null || nuevoProductoDetalles.Cantidad is null || nuevoProductoDetalles.Presentacion
+        is null) return;
         this.producto.ProductoDetalles.Add(nuevoProductoDetalles);
     }
 
+    public void EliminarDetalle(int id)
+    {
+        this.producto.ProductoDetalles.Remove(this.producto.ProductoDetalles.FirstOrDefault(x => x.ProductoDetallesId == id));
+    }
+
+
+    public void CalcularPrecioDetalle()
+    {
+        if (this.nuevoProductoDetalles.Cantidad > 0)
+            this.nuevoProductoDetalles.Precio = (float)this.nuevoProductoDetalles.Cantidad * this.producto.Costo;
+    }
+}
+}
 }
