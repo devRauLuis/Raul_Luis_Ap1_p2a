@@ -25,9 +25,7 @@
                 </select>
             </div>
             <div class="d-flex w-50">
-                <input type='@(_filtro == "id" ? "number" : "text")'
-                    @onchange="args => {_busqueda = args.Value as string; logger.LogInformation(_busqueda);}"
-                    class="form-control text-14" />
+                <input type='@(_filtro == "id" ? "number" : "text")' @bind="_busqueda" class="form-control text-14" />
                 <button @onclick="Filtrar" class="btn btn-primary ms-2">Buscar</button>
             </div>
         </div>
@@ -76,7 +74,7 @@
                         <td>@producto.FechaExpiracion.ToShortDateString()</td>
 
                         <td>
-                            <span class="oi oi-pencil text-primary me-2" aria-hidden='true' title='edit'
+                            <span class="oi oi-eye text-primary me-2" aria-hidden='true' title='edit'
                             @onclick='args => navManager.NavigateTo("/registro/" + producto.ProductoId)' />
                         </td>
                     </tr>
