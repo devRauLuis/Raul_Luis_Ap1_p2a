@@ -1,9 +1,8 @@
-
 using System.Linq.Expressions;
-using ProductsBlazor.DAL;
-using ProductsBlazor.Entidades;
 using Microsoft.EntityFrameworkCore;
 
+using ProductsBlazor.DAL;
+using ProductsBlazor.Entidades;
 
 namespace ProductsBlazor.BLL;
 public class ProductosBLL
@@ -112,13 +111,24 @@ public class ProductosBLL
 
         try
         {
-            return _context.Productos.Where(criterio).ToList();
+            return _context.Productos.Where(criterio).Include(p => p.ProductoDetalles).ToList();
         }
         catch (System.Exception ex)
         {
             throw;
         }
+    }
 
+    public List<ProductoDetallesEmpacados> GetListProductoDetallesEmpacados(Expression<Func<ProductoDetallesEmpacados, bool>> criterio)
+    {
+        try
+        {
+            return _context.ProductoDetallesEmpacados.Where(criterio).ToList();
+        }
+        catch (System.Exception ex)
+        {
+            throw;
+        }
     }
 }
 
