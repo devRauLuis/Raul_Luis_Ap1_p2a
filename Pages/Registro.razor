@@ -2,6 +2,7 @@
 @page "/registro/{ProductoId:int}"
 @inject IToastService toastService
 @inject ILogger<Registro> logger
+@using ServiceStack.Text
 
 <PageTitle>Registro</PageTitle>
 
@@ -88,21 +89,21 @@
                     <div class="">
                         <label for="presentacion" class='form-label'>Descripción</label>
                         <InputText id="presentacion" class="form-control"
-                            @bind-Value='nuevoProductoDetalles.Presentacion' />
-                        <ValidationMessage For="@(() => nuevoProductoDetalles.Presentacion)" />
+                            @bind-Value='productoDetallesActual.Presentacion' />
+                        <ValidationMessage For="@(() => productoDetallesActual.Presentacion)" />
 
                     </div>
                     <div class="">
                         <label for="cantidad" class='form-label'>Cantidad</label>
-                        <InputNumber id="cantidad" class="form-control" @bind-Value='nuevoProductoDetalles.Cantidad'
+                        <InputNumber id="cantidad" class="form-control" @bind-Value='productoDetallesActual.Cantidad'
                             @onblur='CalcularPrecioDetalle' />
-                        <ValidationMessage For="@(() => nuevoProductoDetalles.Cantidad)" />
+                        <ValidationMessage For="@(() => productoDetallesActual.Cantidad)" />
                     </div>
                     <div class="">
                         <label for="precio" class='form-label'>Precio</label>
                         <InputNumber disabled id="precio" class="form-control"
-                            @bind-Value='nuevoProductoDetalles.Precio' />
-                        <ValidationMessage For="@(() => nuevoProductoDetalles.Precio)" />
+                            @bind-Value='productoDetallesActual.Precio' />
+                        <ValidationMessage For="@(() => productoDetallesActual.Precio)" />
                     </div>
                 </div>
                 <button class="btn btn-primary mt-3" @onclick="AgregarProductoDetalles">Agregar Detalle</button>
@@ -129,9 +130,10 @@
                                     <td>
                                         @detalles.Precio
                                     </td>
-
                                     <td>
-                                        <span class="oi oi-trash text-primary me-2 mx-auto" aria-hidden='true' title='delete'
+                                        <span class="oi oi-pencil me-2 mx-auto" aria-hidden='true' title='edit'
+                                    @onclick='args => productoDetallesActual=detalles' />
+                                        <span class="oi oi-trash text-danger mx-auto" aria-hidden='true' title='delete'
                                     @onclick='args => EliminarDetalle(detalles.ProductoDetallesId)' />
                                     </td>
                                 </tr>
@@ -159,7 +161,7 @@
     public ProductosBLL? productosBLL { get; set; }
     public Productos producto { get; set; } = new Productos();
 
-    public ProductoDetalles? nuevoProductoDetalles { get; set; } = new ProductoDetalles();
+    public ProductoDetalles? productoDetallesActual { get; set; } = new ProductoDetalles();
 
     protected override void OnInitialized()
     {
@@ -170,6 +172,7 @@
     public void Nuevo()
     {
         this.producto = new Productos();
+        this.producto.ProductoDetalles = new List<ProductoDetalles>();
         this.ProductoId = 0;
     }
     public void Guardar()
@@ -194,12 +197,18 @@
             if (encontrado is not null)
             {
                 this.producto = encontrado;
+                Console.WriteLine(encontrado.Dump());
             }
             else
             {
                 toastService.ShowError("No se ha encontrado el producto!");
                 this.producto = new Productos();
             }
+        }
+        else
+        {
+            this.producto = new Productos();
+            this.producto.ProductoDetalles = new List<ProductoDetalles>();
         }
     }
 
@@ -228,9 +237,11 @@
 
     public void AgregarProductoDetalles()
     {
-        if (nuevoProductoDetalles.Precio is null || nuevoProductoDetalles.Cantidad is null || nuevoProductoDetalles.Presentacion
+        if (productoDetallesActual.Precio is null || productoDetallesActual.Cantidad is null ||
+        productoDetallesActual.Presentacion
         is null) return;
-        this.producto.ProductoDetalles.Add(nuevoProductoDetalles);
+        this.producto.ProductoDetalles.Add(productoDetallesActual);
+        this.productoDetallesActual = new ProductoDetalles();
     }
 
     public void EliminarDetalle(int id)
@@ -241,9 +252,7 @@
 
     public void CalcularPrecioDetalle()
     {
-        if (this.nuevoProductoDetalles.Cantidad > 0)
-            this.nuevoProductoDetalles.Precio = (float)this.nuevoProductoDetalles.Cantidad * this.producto.Costo;
+        if (this.productoDetallesActual.Cantidad > 0)
+            this.productoDetallesActual.Precio = (float)this.productoDetallesActual.Cantidad * this.producto.Costo;
     }
-}
-}
 }
