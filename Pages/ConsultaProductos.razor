@@ -1,0 +1,150 @@
+@inject IToastService toastService
+@inject ILogger<ConsultaProductos> logger
+@inject NavigationManager navManager
+
+<div class="card shadow-lg">
+    <div class="card-header">
+        <h1 class="card-title">Consulta de productos</h1>
+    </div>
+    <div class="card-body">
+        <div class="d-flex align-items-end justify-content-between">
+
+            <div class="w-15">
+                <label for="inicio">Desde: </label>
+                <input type="date" id="inicio" class="form-control text-14" @bind='_fechaInicio'>
+            </div>
+            <div class="w-15">
+                <label for="fin">Hasta: </label>
+                <input type="date" id="fin" class="form-control text-14" @bind='_fechaFin'>
+            </div>
+            <div class="" style="width:10%">
+                <label for='filtro' class="form-label">Filtro</label>
+                <select id="filtro" class="form-select text-14" @bind='_busqueda'>
+                    <option value="desc">Descripción</option>
+                    <option value="id">ID</option>
+                </select>
+            </div>
+            <div class="d-flex w-50">
+                <input type='@(_filtro == "id" ? "number" : "text")'
+                    @onchange="args => {_busqueda = args.Value as string; logger.LogInformation(_busqueda);}"
+                    class="form-control text-14" />
+                <button @onclick="Filtrar" class="btn btn-primary ms-2">Buscar</button>
+            </div>
+        </div>
+        <table class="table table-light table-striped table-bordered table-hover mt-4">
+            <thead>
+                <tr>
+                    <th scope='col' class="">
+                        ID
+                    </th>
+                    <th scope='col' class="">
+                        Descripcion
+                    </th>
+                    <th scope='col' class="">
+                        Existencia
+                    </th>
+                    <th scope='col' class="">
+                        Costo
+                    </th>
+                    <th scope='col' class="">
+                        Valor Inventario
+                    </th>
+                    <th scope='col' class="">
+                        Ganancia
+                    </th>
+                    <th scope='col' class="">
+                        Precio
+                    </th>
+                    <th scope='col' class="">
+                        Fecha Expiracion
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var producto in this._productos)
+                {
+                    <tr>
+                        <td>@producto.ProductoId</td>
+                        <td>@producto.Descripcion</td>
+                        <td>@producto.Existencia</td>
+                        <td>@producto.Costo</td>
+                        <td>@producto.ValorInventario</td>
+                        <td>@producto.Ganancia</td>
+                        <td>@producto.Precio</td>
+                        <td>@producto.FechaExpiracion.ToShortDateString()</td>
+
+                        <td>
+                            <span class="oi oi-pencil text-primary me-2" aria-hidden='true' title='edit'
+                            @onclick='args => navManager.NavigateTo("/registro/" + producto.ProductoId)' />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    private List<Productos> _productos = new List<Productos>();
+
+    [Inject]
+    public ProductosBLL? productosBLL { get; set; }
+    public string? _filtro { get; set; }
+
+    public DateTime? _fechaInicio { get; set; }
+
+    public DateTime? _fechaFin { get; set; }
+    public string? _busqueda { get; set; }
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this._productos = productosBLL.GetList(p => true);
+    }
+
+    private void Delete(int id)
+    {
+        Debug.WriteLine("Eliminando producto con el id: " + id);
+
+        toastService.ShowSuccess("Deleted successfully");
+    }
+
+    private void Filtrar()
+    {
+        List<Productos> listaProductos = productosBLL.GetList(p => true);
+
+        if (_busqueda is not null && _busqueda.Length > 0)
+        {
+
+            if (_filtro == "id")
+            {
+                int id = int.TryParse(_busqueda, out id) ? id : 0;
+                if (id <= 0)
+                {
+                    toastService.ShowError("ID no valido");
+
+                }
+                else
+                    listaProductos = productosBLL.GetList(p => p.ProductoId == id);
+            }
+            else
+            {
+                logger.LogInformation("Filtrando por el texto: " + _busqueda);
+                listaProductos = productosBLL.GetList(p => p.Descripcion.Contains(_busqueda));
+            }
+        }
+
+
+        if (_fechaInicio > _fechaFin)
+        {
+            toastService.ShowError("Fecha inicio no puede ser mayor a fecha fin");
+        }
+
+        if (_fechaInicio.HasValue || _fechaFin.HasValue)
+            listaProductos = productosBLL.GetList(p => p.FechaExpiracion >= _fechaInicio && p.FechaExpiracion <= _fechaFin);
+
+
+        this._productos = listaProductos;
+    }
+}
