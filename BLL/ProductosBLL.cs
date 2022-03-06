@@ -72,9 +72,9 @@ public class ProductosBLL
         }
     }
 
-    public bool Eliminar(int id)
+    public async Task<bool> Eliminar(int id)
     {
-        var producto = Buscar(id);
+        var producto = await Buscar(id);
 
         if (producto is not null)
         {
@@ -91,12 +91,12 @@ public class ProductosBLL
         return false;
     }
 
-    public Productos? Buscar(int id)
+    public async Task<Productos?> Buscar(int id)
     {
 
         try
         {
-            return _context.Productos.Find(id);
+            return await _context.Productos.Include(p => p.ProductoDetalles).FirstOrDefaultAsync(p => p.ProductoId == id);
 
         }
         catch (System.Exception ex)
