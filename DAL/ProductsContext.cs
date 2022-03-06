@@ -13,7 +13,6 @@ public class ProductsContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ProductoDetallesEmpacados>().ToView(nameof(ProductoDetallesEmpacados)).HasKey(p => p.ProductoDetallesId);
-
     }
     #endregion
 
