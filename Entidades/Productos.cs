@@ -8,7 +8,7 @@ public class Productos
 
     [Required(ErrorMessage = "La descripcion es obligatoria")]
     [MinLength(3, ErrorMessage = "La descripcion al menos {1} caracteres")]
-    [MaxLength(50, ErrorMessage = "La descripcion no puede exceder {1} caracteres")]
+    [MaxLength(100, ErrorMessage = "La descripcion no puede exceder {1} caracteres")]
     public string? Descripcion { get; set; }
 
     [Required]

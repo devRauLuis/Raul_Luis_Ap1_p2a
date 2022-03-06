@@ -8,7 +8,7 @@ public class ProductoDetalles
     public int ProductoDetallesId { get; set; }
 
     [Required]
-    [MaxLength(50, ErrorMessage = "La presentacion no puede exceder {1} caracteres")]
+    [MaxLength(80, ErrorMessage = "La presentacion no puede exceder {1} caracteres")]
     [MinLength(3, ErrorMessage = "La presentacion al menos {1} caracteres")]
     public string? Presentacion { get; set; }
 
