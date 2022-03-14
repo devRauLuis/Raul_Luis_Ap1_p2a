@@ -1,6 +1,5 @@
-@inject IToastService toastService
-@inject ILogger<ConsultaProductos> logger
-@inject NavigationManager navManager
+@page "/consulta-productos"
+
 
 <div class="card shadow-lg">
     <div class="card-header">
@@ -74,7 +73,7 @@
                         <td>@producto.FechaExpiracion?.ToShortDateString()</td>
                         <td>
                             <span class="oi oi-eye text-primary me-2" aria-hidden='true' title='edit'
-                            @onclick='args => navManager.NavigateTo("/registro/" + producto.ProductoId)' />
+                            @onclick='args => navManager.NavigateTo("/registro-productos/" + producto.ProductoId)' />
                         </td>
                     </tr>
                 }
@@ -91,8 +90,8 @@
     public string? _filtro { get; set; }
 
     public DateTime? _fechaInicio { get; set; }
-
     public DateTime? _fechaFin { get; set; }
+    
     public string? _busqueda { get; set; }
     protected override void OnInitialized()
     {

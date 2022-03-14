@@ -1,0 +1,21 @@
+@using ServiceStack.Text
+@inherits LayoutComponentBase
+@layout MainLayout
+@inject NavigationManager NavigationManager
+
+<div class="d-flex align-items-start">
+    <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+        @foreach (var link in _links)
+        {
+            <a href="/@link.Value" class="nav-link @(NavigationManager.Uri.Contains(link.Value) ? "active" : "")">@link.Key</a>
+        }
+    </div>
+    <div class="tab-content w-100" id="v-pills-tabContent">
+        @Body
+    </div>
+</div>
+
+
+@code {
+    public Dictionary<string, string> _links { get; set; } = new Dictionary<string, string>() {{"Consulta Productos", "consulta-productos"}, {"Consulta Detalles", "consulta-detalles"},{"Consulta Empacados", "consulta-empacados"}};
+}

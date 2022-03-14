@@ -1,7 +1,5 @@
-@inject IToastService toastService
-@inject ILogger<ConsultaDetalles> logger
-@inject NavigationManager navManager
-@using ServiceStack.Text
+@page "/consulta-detalles"
+
 
 <div class="card shadow-lg">
     <div class="card-header">
@@ -67,7 +65,7 @@
                             </td>
                             <td>@detalles.ProductoId</td>
                             <td><span class="oi oi-eye text-primary me-2" aria-hidden='true' title='edit'
-                            @onclick='args => navManager.NavigateTo("/registro/" + detalles.ProductoId)' /></td>
+                            @onclick='args => navManager.NavigateTo("/registro-productos/" + detalles.ProductoId)' /></td>
                         </tr>
                     }
                 }
