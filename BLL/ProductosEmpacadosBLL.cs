@@ -62,7 +62,7 @@ public class ProductosEmpacadosBLL
 
         try
         {
-            _context.Entry(productoEmpacado).State = EntityState.Modified;
+            _context.ProductosEmpacados.Update(productoEmpacado);
             var response = _context.SaveChanges() > 0;
             return response;
         }
@@ -80,7 +80,7 @@ public class ProductosEmpacadosBLL
         {
             try
             {
-                _context.ProductosEmpacados.Remove(productoEmpacado);
+                _context.Entry(productoEmpacado).State = EntityState.Deleted;
                 return _context.SaveChanges() > 0;
             }
             catch (System.Exception ex)
@@ -96,7 +96,7 @@ public class ProductosEmpacadosBLL
 
         try
         {
-            return _context.ProductosEmpacados.Include(pe => pe.Utilizados).Include(pe => pe.Producido).ThenInclude(pd => pd.Producto).AsNoTracking().FirstOrDefault(p => p.ProductosEmpacadosId == id);
+            return _context.ProductosEmpacados.Include(pe => pe.Utilizados).Include(pe => pe.Producido).ThenInclude(pd => pd.Producto).FirstOrDefault(p => p.ProductosEmpacadosId == id);
         }
         catch (System.Exception ex)
         {

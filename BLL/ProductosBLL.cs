@@ -61,10 +61,8 @@ public class ProductosBLL
 
         try
         {
-            // _context.Entry(producto).State = EntityState.Modified;
             _context.Update(producto);
             var response = _context.SaveChanges() > 0;
-            // _context.Entry(producto).State = EntityState.Detached;
             return response;
         }
         catch (System.Exception ex)
@@ -160,6 +158,21 @@ public class ProductosBLL
     }
     public bool ActualizarProductoDetalle(ProductoDetalles productoDetalle)
     {
+        try
+        {
+            _context.Update(productoDetalle);
+            var response = _context.SaveChanges() > 0;
+            return response;
+        }
+        catch (System.Exception ex)
+        {
+            throw;
+        }
+    }
+    
+    public bool  ModificarProductoDetalle(ProductoDetalles productoDetalle)
+    {
+
         try
         {
             _context.Update(productoDetalle);
