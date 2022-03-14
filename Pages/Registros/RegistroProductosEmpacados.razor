@@ -1,6 +1,5 @@
-@inject IToastService toastService
-@inject ILogger<RegistroProductosEmpacados> logger
-@using ServiceStack.Text
+@page "/registro-empacados"
+@page "/registro-empacados/{ProductosEmpacadosId:int}"
 
 <EditForm Model="_productoEmpacado" OnValidSubmit="@Guardar">
     <DataAnnotationsValidator/>
@@ -157,6 +156,7 @@
     {
         _productoDetallesPresentacionList = _productosBLL.GetListProductoDetallesPresentacion(x => true);
         _productoEmpacado.Utilizados = new List<PDPUtilizados>();
+        Buscar(ProductosEmpacadosId);
     }
     public void Nuevo()
     {

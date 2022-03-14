@@ -1,6 +1,6 @@
-@inject IToastService toastService
-@inject ILogger<RegistroProductos> logger
-@using ServiceStack.Text
+@page "/registro"
+@page "/registro-productos"
+@page "/registro-productos/{ProductoId:int}"
 
 <EditForm Model="producto" OnValidSubmit="@Guardar">
     <DataAnnotationsValidator />
