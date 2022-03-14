@@ -62,8 +62,11 @@ public class ProductosEmpacadosBLL
 
         try
         {
-            _context.ProductosEmpacados.Update(productoEmpacado);
+            // _context.ProductosEmpacados.Update(productoEmpacado);
+            _context.Entry(productoEmpacado).State = EntityState.Modified;
             var response = _context.SaveChanges() > 0;
+            _context.Entry(productoEmpacado).State = EntityState.Unchanged;
+            _context.SaveChanges();
             return response;
         }
         catch (System.Exception ex)
