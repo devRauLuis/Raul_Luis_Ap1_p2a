@@ -6,8 +6,6 @@ public class PDPUtilizados
 {
     public int PDPUtilizadosId { get; set; }
     public int? CantidadUtilizada { get; set; }
-
     public int? ProductoDetallesId;
-    public ProductoDetalles? ProductoDetalles { get; set; }
 
 }

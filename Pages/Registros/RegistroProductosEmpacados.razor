@@ -250,7 +250,7 @@
     }
     public void AgregarUtilizado()
     {
-        @* if (_pdpUtilizadoId != null && _cantidadPdpUtilizado > 0)
+         if (_pdpUtilizadoId != null && _cantidadPdpUtilizado > 0)
             {
 
             // Busca en el PDP view el producto detalle presentacion utilizado
@@ -260,8 +260,7 @@
             // Busca el producto principal
             var productoUtilizado = _productosBLL.Buscar((int)utilizado.ProductoId);
 
-            if (utilizado.ExistenciaEmpacada < _cantidadPdpUtilizado) { toastService.ShowError("La cantidad no puede ser mayor a la
-            existencia"); return; }
+            if (utilizado.ExistenciaEmpacada < _cantidadPdpUtilizado) { toastService.ShowError("La cantidad no puede ser mayor a la existencia"); return; }
             var existencia = _productoEmpacado.Utilizados?.FirstOrDefault(pe => pe.ProductoDetallesId == _pdpUtilizadoId);
             if (existencia != null)
             {
@@ -284,7 +283,7 @@
             else
             {
             toastService.ShowError("Debe seleccionar un producto y una cantidad");
-            } *@
+            } 
     }
     public void EliminarUtilizado(PDPUtilizados utilizado)
     {
