@@ -1,0 +1,135 @@
+@page "/consulta-empacados"
+
+
+<div class="card shadow-lg">
+    <div class="card-header">
+        <h1 class="card-title">Consulta de empacados</h1>
+    </div>
+    <div class="card-body">
+
+        <form @onsubmit='Filtrar' class="">
+            <div class="d-flex align-items-end gap-3">
+                <div class="w-15">
+                    <label for="inicio">Desde: </label>
+                    <input type="date" id="inicio" class="form-control text-14" @bind='_fechaInicio'>
+                </div>
+                <div class="w-15">
+                    <label for="fin">Hasta: </label>
+                    <input type="date" id="fin" class="form-control text-14" @bind='_fechaFin'>
+                </div>
+                <div class="me-2">
+                    <label for='filtro' class="form-label">Filtro</label>
+                    <select id="filtro" class="form-select text-14" @bind='_filtro'>
+                        <option value="presentacion">Concepto</option>
+                        <option value="producto-empacado-id">Producto empacado ID</option>
+                    </select>
+                </div>
+                <div class="d-flex w-50">
+                    <input type='@(_filtro == "producto-empacado-id" ? "number" : "text")' @bind="_busqueda"
+                           class="form-control text-14"/>
+                    <button type='submit' class="btn btn-primary ms-2">Buscar</button>
+                </div>
+            </div>
+        </form>
+
+        <table class="table table-light table-striped table-bordered table-hover mt-4">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>
+                    Concepto
+                </th>
+                <th>
+                    Fecha
+                </th>
+                <th>
+                    ProductoId
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+
+            @foreach (var pe in this._productosEmpacadosList)
+            {
+                Console.WriteLine(pe.Dump());
+                <tr>
+                    <td>
+                        @pe.ProductosEmpacadosId
+                    </td>
+                    <td>
+                        @pe.Concepto
+                    </td>
+                    <td>
+                        @pe.Fecha
+                    </td>
+                    <td>
+                        @if (pe.Producido != null)
+                        {
+                            @pe.Producido.Producto.ProductoId
+                        }
+                    </td>
+                    <td>
+                        <span class="oi oi-eye text-primary me-2" aria-hidden='true' title='edit'
+                              @onclick='args => navManager.NavigateTo("/registro-empacados/" + pe.ProductosEmpacadosId)'/>
+                    </td>
+                </tr>
+            }
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+
+    [Inject]
+    public ProductosEmpacadosBLL? _productosEmpacadosBLL { get; set; }
+
+    public List<ProductosEmpacados> _productosEmpacadosList { get; set; }
+    public string? _busqueda { get; set; }
+    public string? _filtro { get; set; }
+    public DateTime? _fechaInicio { get; set; }
+    public DateTime? _fechaFin { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this._productosEmpacadosList = this._productosEmpacadosBLL.GetList(p => true);
+    }
+
+    public void Filtrar()
+    {
+        var listaProductos = this._productosEmpacadosBLL.GetList(p => true);
+
+        Console.WriteLine("Filtro: " + _filtro);
+
+        if (_busqueda is not null && _busqueda.Length > 0)
+        {
+            if (_filtro == "producto-empacado-id")
+            {
+                int id = int.TryParse(_busqueda, out id) ? id : 0;
+                if (id <= 0)
+                {
+                    toastService.ShowError("ID no valido");
+
+                }
+                else
+                    listaProductos = this._productosEmpacadosBLL.GetList(pe => pe.ProductosEmpacadosId == id);
+            }
+            else if (_filtro == "desc")
+            {
+                Console.WriteLine("Filtrando por el concepto: " + _busqueda);
+                listaProductos = this._productosEmpacadosBLL.GetList(pe => pe.Concepto.Contains(_busqueda));
+            }
+        }
+        if (_fechaInicio > _fechaFin)
+        {
+            toastService.ShowError("Fecha inicio no puede ser mayor a fecha fin");
+        }
+
+        if (_fechaInicio.HasValue || _fechaFin.HasValue)
+            listaProductos = listaProductos.Where(p => p.Fecha >= _fechaInicio && p.Fecha <= _fechaFin).ToList();
+
+        this._productosEmpacadosList = listaProductos;
+    }
+}
