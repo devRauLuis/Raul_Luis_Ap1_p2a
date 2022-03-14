@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-namespace ProductsBlazor.Entidades;
+namespace Raul_Luis_Ap2_p2a.Entidades;
 public class Productos
 {
     [Key]
@@ -11,31 +11,28 @@ public class Productos
     [MaxLength(100, ErrorMessage = "La descripcion no puede exceder {1} caracteres")]
     public string? Descripcion { get; set; }
 
-    [Required]
     [Range(0, int.MaxValue, ErrorMessage = "El precio debe ser mayor a {1} y menor a {2}")]
-    public int Existencia { get; set; }
+    public int? Existencia { get; set; }
 
     [Required]
     [Range(0, float.MaxValue, ErrorMessage = "El costo debe ser mayor a {1} y menor a {2}")]
-    public float Costo { get; set; }
+    public float? Costo { get; set; }
 
-    [Required]
     [Range(0, float.MaxValue, ErrorMessage = "El valor inventario debe ser mayor a {1} y menor a {2}")]
-    public float ValorInventario { get; set; }
+    public float? ValorInventario { get; set; }
 
     [Required]
     [Range(1, float.MaxValue, ErrorMessage = "El precio debe ser mayor a {1} y menor a {2}")]
-    public float Precio { get; set; }
+    public float? Precio { get; set; }
 
-    [Required]
     [Range(float.MinValue, float.MaxValue, ErrorMessage = "La ganancia debe ser mayor a {1} y menor a {2}")]
-    public float Ganancia { get; set; }
+    public float? Ganancia { get; set; }
 
-    [Required]
     [DataType(DataType.Date)]
-    public DateTime FechaExpiracion { get; set; } = DateTime.Now;
+    public DateTime? FechaExpiracion { get; set; } = DateTime.Now;
 
-    // [ForeignKey("ProductoId")]
-    public ICollection<ProductoDetalles> ProductoDetalles { get; set; }
+    [Range(0, float.MaxValue, ErrorMessage = "El peso debe ser mayor a {1} y menor a {2}")]
+    public float? Peso { get; set; }
+    public ICollection<ProductoDetalles>? ProductoDetalles { get; set; }
 
 }

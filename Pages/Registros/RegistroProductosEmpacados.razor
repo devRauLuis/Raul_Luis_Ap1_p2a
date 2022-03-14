@@ -1,0 +1,296 @@
+@inject IToastService toastService
+@inject ILogger<RegistroProductosEmpacados> logger
+@using ServiceStack.Text
+
+<EditForm Model="_productoEmpacado" OnValidSubmit="@Guardar">
+    <DataAnnotationsValidator />
+    <div class="card shadow-lg">
+        <div class="card-header">
+            <h1 class="card-title">Registro de productos empacados</h1>
+        </div>
+        <div class="card-body">
+            <div class="list-group-item pb-3">
+                <ValidationSummary />
+                <div class="form-group col-3">
+                    <label>Producto Id</label>
+                    <div class="input-group">
+                        <InputNumber @bind-Value="ProductosEmpacadosId" class="form-control col-4" />
+                        <div class="input-group-append">
+                            <button class="btn btn-primary input-group-text" @onclick="BuscarClick" type='button'>
+                                Buscar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group mt-3 col-3">
+                    <label for="fecha" class="form-label">Fecha</label>
+                    <div class="input-group">
+                        <InputDate id="fecha-expiracion" class="form-control" @bind-Value="_productoEmpacado.Fecha" />
+                    </div>
+                    <ValidationMessage For="@(() => _productoEmpacado.Fecha)" />
+                </div>
+                <div class="form-group mt-3">
+                    <label for="concepto" class="form-label">Concepto</label>
+                    <InputText id="concepto" @bind-Value="_productoEmpacado.Concepto" class="form-control" />
+                    <ValidationMessage For="@(() => _productoEmpacado.Concepto)" />
+                </div>
+            </div>
+            <div class="list-group-item pt-4 pb-3">
+                <h3 class="">Utilizados</h3>
+                <div class="d-flex align-items-end justify-content-between w-50">
+                    <div class="form-group mt-3 w-50">
+                        <label for="producto-utilizado" class="form-label">Producto</label>
+                        <select id="producto-utilizado" @bind="_pdpUtilizadoId" class="form-control">
+                            <option disabled value='0'>Seleccione un producto</option>
+                            @foreach (var pdp in _productoDetallesPresentacionList)
+                            {
+                                <option value="@pdp.ProductoDetallesId">@pdp.Descripcion @(pdp.Peso)gr -
+                                    @pdp.ExistenciaEmpacada disponibles</option>
+                            }
+                        </select>
+
+                    </div>
+                    <div class="form-group mt-3 w-15">
+                        <label for="cantidad" class="form-label">Cantidad</label>
+                        <InputNumber @bind-Value="@_cantidadPdpUtilizado" class="form-control" />
+                    </div>
+                    <button type="button" @onclick='AgregarUtilizado' class="btn btn-primary ms-2">Agregar</button>
+                </div>
+                <table class="table table-bordered table-light table-striped mt-3">
+                    <thead>
+                        <tr>
+                            <th>Producto ID</th>
+                            <th>Descripcion</th>
+                            <th>Cantidad Utilizada</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (_productoEmpacado.Utilizados is not null)
+                        {
+                            @foreach (var utilizado in _productoEmpacado.Utilizados)
+                            {
+                                <tr>
+                                    <td>
+                                        @utilizado.ProductoDetallesId
+                                    </td>
+                                    <td>
+                                        @BuscarProductoDetalleDescripcion(utilizado.ProductoDetallesId)
+                                    </td>
+                                    <td>
+                                        @utilizado.CantidadUtilizada
+                                    </td>
+                                    <td>
+                                        <span class="oi oi-trash text-danger mx-auto" aria-hidden='true' title='delete'
+                                    @onclick='args => EliminarUtilizado(utilizado)' />
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="list-group-item pt-4 pb-3">
+                <h3 class="">Producido</h3>
+                <div class="d-flex align-items-end justify-content-between w-30">
+                    <div class="form-group mt-3">
+                        <label for="producto-producido" class="form-label">Producto</label>
+                        <select id="producto-producido" @bind="_pdpProducidoId" class="form-control">
+                            <option disabled value='0'>Seleccione un producto</option>
+                            @foreach (var pdp in _productoDetallesPresentacionList)
+                            {
+                                <option value="@pdp.ProductoDetallesId">@pdp.Descripcion @(pdp.Peso)gr -
+                                    @(pdp.ExistenciaEmpacada > 0 ? pdp.ExistenciaEmpacada : 0) disponibles</option>
+                            }
+                        </select>
+
+                    </div>
+                    <div class="form-group mt-3 w-20">
+                        <label for="cantidad" class="form-label">Cantidad</label>
+                        <input type="number" @bind="@_cantidadPdpProducido" class="form-control" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <button type="button" class="btn btn-primary mt-4" @onclick="Nuevo">Nuevo</button>
+            <button class="btn btn-success mt-4" type='submit'>Guardar</button>
+            <button type="button" class="btn btn-danger mt-4" @onclick="Eliminar">Eliminar</button>
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+
+    [Parameter]
+    public int ProductosEmpacadosId { get; set; }
+    public ProductosEmpacados _productoEmpacado { get; set; } = new ProductosEmpacados();
+    public List<ProductoDetallesPresentacion> _productoDetallesPresentacionList { get; set; } = new
+    List<ProductoDetallesPresentacion>();
+
+    [Inject]
+    public ProductosBLL _productosBLL { get; set; }
+
+    [Inject]
+    public ProductosEmpacadosBLL _productosEmpacadosBLL { get; set; }
+
+    public int? _pdpUtilizadoId { get; set; } = 0;
+    public int? _pdpProducidoId { get; set; } = 0;
+
+    public int _cantidadPdpUtilizado { get; set; }
+    public int? _cantidadPdpProducido { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _productoDetallesPresentacionList = _productosBLL.GetListProductoDetallesPresentacion(x => true);
+        _productoEmpacado.Utilizados = new List<PDPUtilizados>();
+    }
+    public void Nuevo()
+    {
+        this._productoEmpacado = new ProductosEmpacados();
+        this._productoEmpacado.Utilizados = new List<PDPUtilizados>();
+        this._pdpProducidoId = 0;
+        this._cantidadPdpProducido = 0;
+        this.ProductosEmpacadosId = 0;
+    }
+
+    public void BuscarClick()
+    {
+
+        Buscar(ProductosEmpacadosId);
+    }
+
+    public void Buscar(int id)
+    {
+        if (id > 0)
+        {
+            var encontrado = _productosEmpacadosBLL.Buscar(id);
+            if (encontrado is not null)
+            {
+                this._productoEmpacado = encontrado;
+                Console.WriteLine("Encontrado:\n" + encontrado.Dump() + encontrado.Producido.Dump());
+                this._pdpProducidoId = encontrado.Producido.ProductoDetallesId;
+                this._cantidadPdpProducido = encontrado.Producido.Producto.Existencia;
+            }
+            else
+            {
+                toastService.ShowError("No se ha encontrado el producto!");
+                Nuevo();
+            }
+        }
+        else
+        {
+            Nuevo();
+        }
+    }
+
+    public string BuscarProductoDetalleDescripcion(int? id)
+    {
+        var desc = "";
+        try
+        {
+            var pd = _productosBLL.BuscarProductoDetalle(id);
+            Console.WriteLine($"Producto detalle: {id} \n {pd.Dump()}");
+            desc = pd?.Producto?.Descripcion;
+        }
+        catch (Exception e)
+        {
+        }
+        return desc != null ? desc : "";
+    }
+    public void Guardar()
+    {
+        Console.WriteLine("Producto empacado: \n" + _productoEmpacado.Dump());
+        if (_productoEmpacado.Utilizados.Count < 1)
+        {
+            toastService.ShowError("Debe haber por lo menos un producto utilizado");
+            return;
+        }
+        if (_pdpProducidoId == null || _pdpProducidoId < 1)
+        {
+            toastService.ShowError("Debe especificar un producto producido");
+            return;
+        }
+        _productoEmpacado.Producido = _productosBLL.BuscarProductoDetalle(_pdpProducidoId);
+        _productoEmpacado.Producido.Cantidad = 1;
+        _productoEmpacado.Producido.Producto.Existencia = _cantidadPdpProducido;
+
+        Console.WriteLine("Producto empacado antes de guardar: \n" + _productoEmpacado.Dump() + "\nProducto Detalle: \n" +
+        _productoEmpacado.Producido.Dump() + "\nProducto: \n" + _productoEmpacado.Producido.Producto.Dump() + "\n");
+        if (_productosEmpacadosBLL.Guardar(_productoEmpacado))
+        {
+            toastService.ShowSuccess("Guardado con éxito");
+        }
+        else toastService.ShowError("Ocurrió un error al guardar");
+    }
+
+    public void ActualizarExistencia()
+    {
+        foreach (var utilizado in _productoEmpacado.Utilizados)
+        {
+            var pd = _productosBLL.BuscarProductoDetalle(utilizado.ProductoDetallesId);
+
+            @* _productosBLL.Guardar(producto); *@
+        }
+    }
+    public void Eliminar()
+    {
+        var id = this._productoEmpacado?.ProductosEmpacadosId;
+        if (id != null && id > 0)
+        {
+            bool eliminado = _productosEmpacadosBLL.Eliminar((int)id);
+            if (eliminado)
+            {
+                Nuevo();
+                toastService.ShowSuccess("Eliminado con éxito");
+            }
+            else toastService.ShowError("Ocurrió un error al eliminar!");
+        }
+    }
+    public void AgregarUtilizado()
+    {
+        @* if (_pdpUtilizadoId != null && _cantidadPdpUtilizado > 0)
+            {
+
+            // Busca en el PDP view el producto detalle presentacion utilizado
+            var utilizado = _productoDetallesPresentacionList.FirstOrDefault(x => x.ProductoDetallesId == _pdpUtilizadoId);
+            if (utilizado != null)
+            {
+            // Busca el producto principal
+            var productoUtilizado = _productosBLL.Buscar((int)utilizado.ProductoId);
+
+            if (utilizado.ExistenciaEmpacada < _cantidadPdpUtilizado) { toastService.ShowError("La cantidad no puede ser mayor a la
+            existencia"); return; }
+            var existencia = _productoEmpacado.Utilizados?.FirstOrDefault(pe => pe.ProductoDetallesId == _pdpUtilizadoId);
+            if (existencia != null)
+            {
+            existencia.CantidadUtilizada = _cantidadPdpUtilizado;
+            }
+            else
+            {
+            var nuevoUtilizado = new PDPUtilizados()
+            {
+            ProductoDetallesId = utilizado.ProductoDetallesId,
+            CantidadUtilizada = _cantidadPdpUtilizado
+            };
+            _productoEmpacado.Utilizados?.Add(nuevoUtilizado);
+            Console.WriteLine("Nuevo Utilizado: \n" + nuevoUtilizado.Dump());
+            }
+            _cantidadPdpUtilizado = 0;
+            _pdpUtilizadoId = 0;
+            }
+            }
+            else
+            {
+            toastService.ShowError("Debe seleccionar un producto y una cantidad");
+            } *@
+    }
+    public void EliminarUtilizado(PDPUtilizados utilizado)
+    {
+        _cantidadPdpUtilizado = utilizado.CantidadUtilizada != null ? (int)utilizado.CantidadUtilizada : 0;
+        _pdpUtilizadoId = utilizado.ProductoDetallesId;
+        _productoEmpacado.Utilizados?.Remove(utilizado);
+    }
+
+}

@@ -66,13 +66,12 @@
                     <tr>
                         <td>@producto.ProductoId</td>
                         <td>@producto.Descripcion</td>
-                        <td>@producto.Existencia</td>
+                        <td>@(producto.Existencia)</td>
                         <td>@producto.Costo</td>
                         <td>@producto.ValorInventario</td>
                         <td>@producto.Ganancia</td>
                         <td>@producto.Precio</td>
-                        <td>@producto.FechaExpiracion.ToShortDateString()</td>
-
+                        <td>@producto.FechaExpiracion?.ToShortDateString()</td>
                         <td>
                             <span class="oi oi-eye text-primary me-2" aria-hidden='true' title='edit'
                             @onclick='args => navManager.NavigateTo("/registro/" + producto.ProductoId)' />
@@ -140,8 +139,8 @@
         }
 
         if (_fechaInicio.HasValue || _fechaFin.HasValue)
-            listaProductos = productosBLL.GetList(p => p.FechaExpiracion >= _fechaInicio && p.FechaExpiracion <= _fechaFin);
-
+            listaProductos = listaProductos.Where(p => p.FechaExpiracion >= _fechaInicio && p.FechaExpiracion <=
+            _fechaFin).ToList();
 
         this._productos = listaProductos;
     }

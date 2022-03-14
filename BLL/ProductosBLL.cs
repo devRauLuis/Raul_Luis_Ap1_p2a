@@ -1,10 +1,10 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 
-using ProductsBlazor.DAL;
-using ProductsBlazor.Entidades;
+using Raul_Luis_Ap2_p2a.DAL;
+using Raul_Luis_Ap2_p2a.Entidades;
 
-namespace ProductsBlazor.BLL;
+namespace Raul_Luis_Ap2_p2a.BLL;
 public class ProductosBLL
 {
     private ProductsContext _context;
@@ -18,7 +18,7 @@ public class ProductosBLL
     {
         try
         {
-            return _context.Productos.Any(p => p.ProductoId == id);
+            return _context.Productos.AsNoTracking().Any(p => p.ProductoId == id);
 
         }
         catch (System.Exception ex)
@@ -43,7 +43,7 @@ public class ProductosBLL
         }
     }
 
-    public bool Insertar(Productos producto)
+    private bool Insertar(Productos producto)
     {
         try
         {
@@ -56,15 +56,16 @@ public class ProductosBLL
         }
 
     }
-
-    public bool Modificar(Productos producto)
+    private bool Modificar(Productos producto)
     {
 
         try
         {
-            _context.Entry(producto).State = EntityState.Modified;
-            return _context.SaveChanges() > 0;
-
+            // _context.Entry(producto).State = EntityState.Modified;
+            _context.Update(producto);
+            var response = _context.SaveChanges() > 0;
+            // _context.Entry(producto).State = EntityState.Detached;
+            return response;
         }
         catch (System.Exception ex)
         {
@@ -72,15 +73,15 @@ public class ProductosBLL
         }
     }
 
-    public async Task<bool> Eliminar(int id)
+    public bool Eliminar(int id)
     {
-        var producto = await Buscar(id);
+        var producto = Buscar(id);
 
         if (producto is not null)
         {
             try
             {
-                _context.Productos.Remove(producto);
+                _context.Entry(producto).State = EntityState.Deleted;
                 return _context.SaveChanges() > 0;
             }
             catch (System.Exception ex)
@@ -91,12 +92,12 @@ public class ProductosBLL
         return false;
     }
 
-    public async Task<Productos?> Buscar(int id)
+    public Productos? Buscar(int id)
     {
 
         try
         {
-            return await _context.Productos.Include(p => p.ProductoDetalles).FirstOrDefaultAsync(p => p.ProductoId == id);
+            return _context.Productos.Include(p => p.ProductoDetalles).AsNoTracking().FirstOrDefault(p => p.ProductoId == id);
 
         }
         catch (System.Exception ex)
@@ -111,7 +112,7 @@ public class ProductosBLL
 
         try
         {
-            return _context.Productos.Where(criterio).Include(p => p.ProductoDetalles).ToList();
+            return _context.Productos.Where(criterio).Include(p => p.ProductoDetalles).AsNoTracking().ToList();
         }
         catch (System.Exception ex)
         {
@@ -119,16 +120,57 @@ public class ProductosBLL
         }
     }
 
-    public List<ProductoDetallesEmpacados> GetListProductoDetallesEmpacados(Expression<Func<ProductoDetallesEmpacados, bool>> criterio)
+    public List<ProductoDetallesPresentacion> GetListProductoDetallesPresentacion(Expression<Func<ProductoDetallesPresentacion, bool>> criterio)
     {
         try
         {
-            return _context.ProductoDetallesEmpacados.Where(criterio).ToList();
+            return _context.ProductoDetallesPresentacion.Where(criterio).AsNoTracking().ToList();
         }
         catch (System.Exception ex)
         {
             throw;
         }
     }
+
+    public List<ProductoDetalles> GetListProductoDetalles(Expression<Func<ProductoDetalles, bool>> criterio)
+    {
+        try
+        {
+            return _context.ProductoDetalles.Where(criterio).AsNoTracking().ToList();
+        }
+        catch (System.Exception ex)
+        {
+            throw;
+        }
+    }
+
+
+    public ProductoDetalles? BuscarProductoDetalle(int? id)
+    {
+
+        try
+        {
+            return _context.ProductoDetalles.Include(p => p.Producto).FirstOrDefault(p => p.ProductoDetallesId == id);
+        }
+        catch (System.Exception ex)
+        {
+            throw;
+        }
+
+    }
+    public bool ActualizarProductoDetalle(ProductoDetalles productoDetalle)
+    {
+        try
+        {
+            _context.Update(productoDetalle);
+            var response = _context.SaveChanges() > 0;
+            return response;
+        }
+        catch (System.Exception ex)
+        {
+            throw;
+        }
+    }
+
 }
 

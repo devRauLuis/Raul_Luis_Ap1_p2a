@@ -1,0 +1,29 @@
+﻿<Properties StartupConfiguration="{3B8BF14F-88A8-4F08-82A1-C16342F19F29}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Pages/Registros/RegistroProductosEmpacados.razor">
+    <Files>
+      <File FileName="Pages/Registros/RegistroProductosEmpacados.razor" Line="140" Column="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Raul_Luis_Ap2_p2a" expanded="True">
+            <Node name="Raul_Luis_Ap2_p2a" expanded="True">
+              <Node name="Pages" expanded="True">
+                <Node name="Registros" expanded="True">
+                  <Node name="RegistroProductosEmpacados.razor" selected="True" />
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.Raul__Luis__Ap2__p2a PreferredExecutionTarget="/Applications/Google Chrome.app" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>

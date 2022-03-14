@@ -1,0 +1,27 @@
+@page "/registro"
+@page "/registro/{ProductoId:int}"
+
+<PageTitle>Registro</PageTitle>
+
+<div class="d-flex align-items-start">
+    <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+        <NavButton Name="Productos" Id="productos" ClassName="active" />
+        <NavButton Name="Productos Empacados" Id="productos-empacados" ClassName="mt-2" />
+    </div>
+    <div class="tab-content w-100" id="v-pills-tabContent">
+        <TabPane Id="productos" ClassName="active">
+            <RegistroProductos ProductoId='ProductoId' />
+        </TabPane>
+        <TabPane Id="productos-empacados">
+            <RegistroProductosEmpacados />
+        </TabPane>
+
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public int ProductoId { get; set; }
+
+}

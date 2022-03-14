@@ -63,7 +63,7 @@
                                 @detalles.Precio
                             </td>
                             <td>
-                                @detalles.ExistenciaEmpacada
+                                @(detalles.ExistenciaEmpacada > 0 ? detalles.ExistenciaEmpacada : 0)
                             </td>
                             <td>@detalles.ProductoId</td>
                             <td><span class="oi oi-eye text-primary me-2" aria-hidden='true' title='edit'
@@ -80,18 +80,20 @@
 
     [Inject]
     public ProductosBLL? _productosBLL { get; set; }
-    public List<ProductoDetallesEmpacados>? _productoDetalles { get; set; }
+
+    public List<ProductoDetallesPresentacion>? _productoDetalles { get; set; }
+
     public string? _busqueda { get; set; }
     public string? _filtro { get; set; }
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        this._productoDetalles = this._productosBLL?.GetListProductoDetallesEmpacados(p => true);
+        this._productoDetalles = this._productosBLL?.GetListProductoDetallesPresentacion(p => true);
     }
 
     public void Filtrar()
     {
-        List<ProductoDetallesEmpacados>? listaProductos = _productosBLL?.GetListProductoDetallesEmpacados(p => true);
+        List<ProductoDetallesPresentacion>? listaProductos = _productosBLL?.GetListProductoDetallesPresentacion(p => true);
 
         Console.WriteLine("Filtro: " + _filtro);
 
@@ -107,18 +109,18 @@
 
                 }
                 else
-                    listaProductos = _productosBLL?.GetListProductoDetallesEmpacados(pde => pde.ProductoId == id);
+                    listaProductos = _productosBLL?.GetListProductoDetallesPresentacion(pde => pde.ProductoId == id);
             }
             else if (_filtro == "desc")
             {
                 Console.WriteLine("Filtrando por la descripcion: " + _busqueda);
 
-                listaProductos = _productosBLL?.GetListProductoDetallesEmpacados(pde => pde.Descripcion.Contains(_busqueda));
+                listaProductos = _productosBLL?.GetListProductoDetallesPresentacion(pde => pde.Descripcion.Contains(_busqueda));
             }
             else
             {
                 Console.WriteLine("Filtrando por la presentacion: " + _busqueda);
-                listaProductos = _productosBLL?.GetListProductoDetallesEmpacados(pde => pde.Presentacion.Contains(_busqueda));
+                listaProductos = _productosBLL?.GetListProductoDetallesPresentacion(pde => pde.Presentacion.Contains(_busqueda));
             }
         }
 
