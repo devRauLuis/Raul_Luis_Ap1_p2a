@@ -26,12 +26,10 @@ public class ProductosBLL
             throw;
         }
 
-
     }
 
     public bool Guardar(Productos producto)
     {
-
         try
         {
             return !Existe(producto.ProductoId) ? Insertar(producto) : Modificar(producto);
@@ -90,7 +88,7 @@ public class ProductosBLL
         return false;
     }
 
-    public Productos? Buscar(int id)
+    public Productos? Buscar(int? id)
     {
 
         try
@@ -148,7 +146,7 @@ public class ProductosBLL
 
         try
         {
-            return _context.ProductoDetalles.Include(p => p.Producto).FirstOrDefault(p => p.ProductoDetallesId == id);
+            return _context.ProductoDetalles.Include(p => p.Producto).AsNoTracking().FirstOrDefault(p => p.ProductoDetallesId == id);
         }
         catch (System.Exception ex)
         {
@@ -169,10 +167,9 @@ public class ProductosBLL
             throw;
         }
     }
-    
-    public bool  ModificarProductoDetalle(ProductoDetalles productoDetalle)
-    {
 
+    public bool ModificarProductoDetalle(ProductoDetalles productoDetalle)
+    {
         try
         {
             _context.Update(productoDetalle);
@@ -184,6 +181,5 @@ public class ProductosBLL
             throw;
         }
     }
-
 }
 

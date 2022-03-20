@@ -7,7 +7,6 @@ namespace Raul_Luis_Ap2_p2a.BLL;
 
 public class ProductosEmpacadosBLL
 {
-
     private ProductsContext _context;
 
     public ProductosEmpacadosBLL(ProductsContext context)
@@ -34,7 +33,8 @@ public class ProductosEmpacadosBLL
         try
         {
             var id = productoEmpacado.ProductosEmpacadosId;
-            return !Existe(id != null ? (int)id : 0) ? Insertar(productoEmpacado) : Modificar(productoEmpacado);
+            return !Existe(id != null ? (int) id : 0) ? Insertar(productoEmpacado) : Modificar(productoEmpacado);
+
         }
         catch (System.Exception ex)
         {
@@ -43,13 +43,15 @@ public class ProductosEmpacadosBLL
         }
     }
 
-    public bool Insertar(ProductosEmpacados productosEmpacados)
+    public bool Insertar(ProductosEmpacados productoEmpacado)
     {
         try
         {
-            _context.Entry(productosEmpacados).State = EntityState.Added;
-            _context.SaveChanges();
-            return true;
+            // _context.Entry(productosEmpacados).State = EntityState.Added;
+            // _context.SaveChanges();
+            _context.ProductosEmpacados.Add(productoEmpacado);
+
+            return _context.SaveChanges() > 0;
         }
         catch (System.Exception)
         {
@@ -62,12 +64,8 @@ public class ProductosEmpacadosBLL
 
         try
         {
-            // _context.ProductosEmpacados.Update(productoEmpacado);
-            _context.Entry(productoEmpacado).State = EntityState.Modified;
-            var response = _context.SaveChanges() > 0;
-            _context.Entry(productoEmpacado).State = EntityState.Unchanged;
-            _context.SaveChanges();
-            return response;
+            _context.Update(productoEmpacado);
+            return _context.SaveChanges() > 0;
         }
         catch (System.Exception ex)
         {
@@ -91,6 +89,7 @@ public class ProductosEmpacadosBLL
                 throw;
             }
         }
+
         return false;
     }
 
@@ -99,7 +98,8 @@ public class ProductosEmpacadosBLL
 
         try
         {
-            return _context.ProductosEmpacados.Include(pe => pe.Utilizados).Include(pe => pe.Producido).ThenInclude(pd => pd.Producto).FirstOrDefault(p => p.ProductosEmpacadosId == id);
+            return _context.ProductosEmpacados.Include(pe => pe.Utilizados).Include(pe => pe.Producido).AsNoTracking()
+                .FirstOrDefault(p => p.ProductosEmpacadosId == id);
         }
         catch (System.Exception ex)
         {
@@ -113,12 +113,12 @@ public class ProductosEmpacadosBLL
 
         try
         {
-            return _context.ProductosEmpacados.Where(criterio).Include(pe => pe.Utilizados).AsNoTracking().ToList();
+            return _context.ProductosEmpacados.Where(criterio).Include(pe => pe.Utilizados).Include(pe => pe.Producido)
+                .AsNoTracking().ToList();
         }
         catch (System.Exception ex)
         {
             throw;
         }
     }
-
 }
