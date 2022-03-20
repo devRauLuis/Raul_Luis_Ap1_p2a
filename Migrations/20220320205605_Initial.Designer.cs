@@ -11,8 +11,8 @@ using Raul_Luis_Ap2_p2a.DAL;
 namespace Raul_Luis_Ap2_p2a.Migrations
 {
     [DbContext(typeof(ProductsContext))]
-    [Migration("20220314065939_PDPView")]
-    partial class PDPView
+    [Migration("20220320205605_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -35,8 +35,6 @@ namespace Raul_Luis_Ap2_p2a.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("PDPUtilizadosId");
-
-                    b.HasIndex("ProductoDetallesId");
 
                     b.HasIndex("ProductosEmpacadosId");
 
@@ -158,27 +156,21 @@ namespace Raul_Luis_Ap2_p2a.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("ProducidoProductoDetallesId")
+                    b.Property<int?>("ProducidoProductoId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("ProductosEmpacadosId");
 
-                    b.HasIndex("ProducidoProductoDetallesId");
+                    b.HasIndex("ProducidoProductoId");
 
                     b.ToTable("ProductosEmpacados");
                 });
 
             modelBuilder.Entity("Raul_Luis_Ap2_p2a.Entidades.PDPUtilizados", b =>
                 {
-                    b.HasOne("Raul_Luis_Ap2_p2a.Entidades.ProductoDetalles", "ProductoDetalles")
-                        .WithMany()
-                        .HasForeignKey("ProductoDetallesId");
-
                     b.HasOne("Raul_Luis_Ap2_p2a.Entidades.ProductosEmpacados", null)
                         .WithMany("Utilizados")
                         .HasForeignKey("ProductosEmpacadosId");
-
-                    b.Navigation("ProductoDetalles");
                 });
 
             modelBuilder.Entity("Raul_Luis_Ap2_p2a.Entidades.ProductoDetalles", b =>
@@ -192,9 +184,9 @@ namespace Raul_Luis_Ap2_p2a.Migrations
 
             modelBuilder.Entity("Raul_Luis_Ap2_p2a.Entidades.ProductosEmpacados", b =>
                 {
-                    b.HasOne("Raul_Luis_Ap2_p2a.Entidades.ProductoDetalles", "Producido")
+                    b.HasOne("Raul_Luis_Ap2_p2a.Entidades.Productos", "Producido")
                         .WithMany()
-                        .HasForeignKey("ProducidoProductoDetallesId");
+                        .HasForeignKey("ProducidoProductoId");
 
                     b.Navigation("Producido");
                 });

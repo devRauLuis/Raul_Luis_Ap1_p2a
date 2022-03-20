@@ -59,16 +59,16 @@ namespace Raul_Luis_Ap2_p2a.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Concepto = table.Column<string>(type: "TEXT", maxLength: 80, nullable: false),
                     Fecha = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    ProducidoProductoDetallesId = table.Column<int>(type: "INTEGER", nullable: true)
+                    ProducidoProductoId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProductosEmpacados", x => x.ProductosEmpacadosId);
                     table.ForeignKey(
-                        name: "FK_ProductosEmpacados_ProductoDetalles_ProducidoProductoDetallesId",
-                        column: x => x.ProducidoProductoDetallesId,
-                        principalTable: "ProductoDetalles",
-                        principalColumn: "ProductoDetallesId");
+                        name: "FK_ProductosEmpacados_Productos_ProducidoProductoId",
+                        column: x => x.ProducidoProductoId,
+                        principalTable: "Productos",
+                        principalColumn: "ProductoId");
                 });
 
             migrationBuilder.CreateTable(
@@ -85,21 +85,11 @@ namespace Raul_Luis_Ap2_p2a.Migrations
                 {
                     table.PrimaryKey("PK_PDPUtilizados", x => x.PDPUtilizadosId);
                     table.ForeignKey(
-                        name: "FK_PDPUtilizados_ProductoDetalles_ProductoDetallesId",
-                        column: x => x.ProductoDetallesId,
-                        principalTable: "ProductoDetalles",
-                        principalColumn: "ProductoDetallesId");
-                    table.ForeignKey(
                         name: "FK_PDPUtilizados_ProductosEmpacados_ProductosEmpacadosId",
                         column: x => x.ProductosEmpacadosId,
                         principalTable: "ProductosEmpacados",
                         principalColumn: "ProductosEmpacadosId");
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PDPUtilizados_ProductoDetallesId",
-                table: "PDPUtilizados",
-                column: "ProductoDetallesId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PDPUtilizados_ProductosEmpacadosId",
@@ -112,9 +102,9 @@ namespace Raul_Luis_Ap2_p2a.Migrations
                 column: "ProductoId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductosEmpacados_ProducidoProductoDetallesId",
+                name: "IX_ProductosEmpacados_ProducidoProductoId",
                 table: "ProductosEmpacados",
-                column: "ProducidoProductoDetallesId");
+                column: "ProducidoProductoId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -123,10 +113,10 @@ namespace Raul_Luis_Ap2_p2a.Migrations
                 name: "PDPUtilizados");
 
             migrationBuilder.DropTable(
-                name: "ProductosEmpacados");
+                name: "ProductoDetalles");
 
             migrationBuilder.DropTable(
-                name: "ProductoDetalles");
+                name: "ProductosEmpacados");
 
             migrationBuilder.DropTable(
                 name: "Productos");

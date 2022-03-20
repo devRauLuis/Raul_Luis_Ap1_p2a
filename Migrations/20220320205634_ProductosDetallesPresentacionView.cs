@@ -4,7 +4,7 @@
 
 namespace Raul_Luis_Ap2_p2a.Migrations
 {
-    public partial class PDPView : Migration
+    public partial class ProductosDetallesPresentacionView : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

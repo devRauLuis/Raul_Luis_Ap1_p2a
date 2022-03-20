@@ -11,8 +11,8 @@ using Raul_Luis_Ap2_p2a.DAL;
 namespace Raul_Luis_Ap2_p2a.Migrations
 {
     [DbContext(typeof(ProductsContext))]
-    [Migration("20220314073811_UpdateModels")]
-    partial class UpdateModels
+    [Migration("20220320205634_ProductosDetallesPresentacionView")]
+    partial class ProductosDetallesPresentacionView
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -26,6 +26,9 @@ namespace Raul_Luis_Ap2_p2a.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("CantidadUtilizada")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("ProductoDetallesId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("ProductosEmpacadosId")
@@ -153,12 +156,12 @@ namespace Raul_Luis_Ap2_p2a.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("ProducidoProductoDetallesId")
+                    b.Property<int?>("ProducidoProductoId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("ProductosEmpacadosId");
 
-                    b.HasIndex("ProducidoProductoDetallesId");
+                    b.HasIndex("ProducidoProductoId");
 
                     b.ToTable("ProductosEmpacados");
                 });
@@ -181,9 +184,9 @@ namespace Raul_Luis_Ap2_p2a.Migrations
 
             modelBuilder.Entity("Raul_Luis_Ap2_p2a.Entidades.ProductosEmpacados", b =>
                 {
-                    b.HasOne("Raul_Luis_Ap2_p2a.Entidades.ProductoDetalles", "Producido")
+                    b.HasOne("Raul_Luis_Ap2_p2a.Entidades.Productos", "Producido")
                         .WithMany()
-                        .HasForeignKey("ProducidoProductoDetallesId");
+                        .HasForeignKey("ProducidoProductoId");
 
                     b.Navigation("Producido");
                 });
