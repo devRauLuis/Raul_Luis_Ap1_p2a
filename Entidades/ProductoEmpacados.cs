@@ -19,6 +19,6 @@ public class ProductosEmpacados
     [Required]
     public ICollection<PDPUtilizados>? Utilizados { get; set; }
 
-    public ProductoDetalles? Producido { get; set; }
+    public Productos? Producido { get; set; }
 
 }
