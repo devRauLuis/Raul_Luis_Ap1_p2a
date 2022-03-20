@@ -94,6 +94,7 @@
                     <div class="input-group">
                         <input disabled type="number" @bind="_pesoTotal" class="form-control"/>
                         <span class="input-group-text">gr</span>
+
                     </div>
                 </div>
             </div>
@@ -102,20 +103,20 @@
                 <div class="d-flex align-items-end justify-content-between w-30">
                     <div class="form-group mt-3">
                         <label for="producto-producido" class="form-label">Producto</label>
-                        <select id="producto-producido" @bind="_pdpProducidoId" class="form-control">
+                        <select id="producto-producido" @bind="_producidoId" class="form-control">
                             <option disabled value='0'>Seleccione un producto</option>
-                            @foreach (var pdp in _productoDetallesPresentacionList)
+                            @foreach (var p in _productosList)
                             {
-                                <option value="@pdp.ProductoDetallesId">
-                                    @pdp.Descripcion @(pdp.Peso)gr -
-                                    @(pdp.ExistenciaEmpacada > 0 ? pdp.ExistenciaEmpacada : 0) disponibles
+                                <option value="@p.ProductoId">
+                                    @p.Descripcion @(p.Peso)gr -
+                                    @(p.Existencia > 0 ? p.Existencia : 0) disponibles
                                 </option>
                             }
                         </select>
                     </div>
                     <div class="form-group mt-3 ms-3 w-20">
                         <label for="cantidad" class="form-label">Cantidad</label>
-                        <input type="number" @bind="@_cantidadPdpProducido" class="form-control"/>
+                        <input type="number" @bind="@_cantidadProducido" class="form-control"/>
                     </div>
                 </div>
             </div>
@@ -138,6 +139,8 @@
     public List<ProductoDetallesPresentacion> _productoDetallesPresentacionList { get; set; } = new
         List<ProductoDetallesPresentacion>();
 
+    public List<Productos> _productosList { get; set; } = new List<Productos>();
+
     [Inject]
     public ProductosBLL _productosBLL { get; set; }
 
@@ -145,16 +148,17 @@
     public ProductosEmpacadosBLL _productosEmpacadosBLL { get; set; }
 
     public int? _pdpUtilizadoId { get; set; } = 0;
-    public int? _pdpProducidoId { get; set; } = 0;
+    public int? _producidoId { get; set; } = 0;
 
     public int _cantidadPdpUtilizado { get; set; }
-    public int? _cantidadPdpProducido { get; set; }
+    public int? _cantidadProducido { get; set; }
 
     public float? _pesoTotal { get; set; }
 
     protected override void OnInitialized()
     {
         _productoDetallesPresentacionList = _productosBLL.GetListProductoDetallesPresentacion(x => true);
+        _productosList = _productosBLL.GetList(x => true);
         _productoEmpacado.Utilizados = new List<PDPUtilizados>();
         Buscar(ProductosEmpacadosId);
     }
@@ -162,15 +166,21 @@
     {
         this._productoEmpacado = new ProductosEmpacados();
         this._productoEmpacado.Utilizados = new List<PDPUtilizados>();
-        this._pdpProducidoId = 0;
-        this._cantidadPdpProducido = 0;
+        this._producidoId = 0;
+        this._cantidadProducido = 0;
         this.ProductosEmpacadosId = 0;
         this._pesoTotal = 0;
     }
     public void CalcularPesoTotal()
     {
-
-        _pesoTotal = _productoEmpacado.Utilizados.Sum(u => _productosBLL.BuscarProductoDetalle(u.ProductoDetallesId).Producto.Peso);
+        var total = 0f;
+        foreach (var u in _productoEmpacado.Utilizados)
+        {
+            var pd = _productosBLL.BuscarProductoDetalle(u.ProductoDetallesId);
+            total += (float) ((pd.Producto.Peso * pd.Cantidad) * u.CantidadUtilizada);
+            Console.WriteLine("Peso total: ", total);
+        }
+        _pesoTotal = total;
     }
     public void BuscarClick()
     {
@@ -187,8 +197,8 @@
             {
                 this._productoEmpacado = encontrado;
                 Console.WriteLine("Encontrado:\n" + encontrado.Dump() + encontrado.Producido.Dump());
-                this._pdpProducidoId = encontrado.Producido.ProductoDetallesId;
-                this._cantidadPdpProducido = encontrado.Producido.Producto.Existencia;
+                this._producidoId = encontrado.Producido.ProductoId;
+                this._cantidadProducido = encontrado.Producido.Existencia;
                 CalcularPesoTotal();
             }
             else
@@ -225,15 +235,26 @@
             toastService.ShowError("Debe haber por lo menos un producto utilizado");
             return;
         }
-        if (_pdpProducidoId == null || _pdpProducidoId < 1)
+        if (_producidoId == null || _producidoId < 1)
         {
             toastService.ShowError("Debe especificar un producto producido");
             return;
         }
-        _productoEmpacado.Producido = _productosBLL.BuscarProductoDetalle(_pdpProducidoId);
-        ActualizarExistenciaProducido(_cantidadPdpProducido);
+        if (_cantidadProducido == null || _cantidadProducido < 1)
+        {
+            toastService.ShowError("Debe especificar una cantidad de producto producido");
+            return;
+        }
+        if (_cantidadProducido > (_pesoTotal / (_productosBLL.Buscar(_producidoId)?.Peso)))
+        {
+            toastService.ShowError("La cantidad de producto producido es mayor a la cantidad disponible");
+            return;
+        }
+        _productoEmpacado.Producido = _productosBLL.Buscar(_producidoId);
+
+        ActualizarExistenciaProducido(_cantidadProducido);
         Console.WriteLine("Producto empacado antes de guardar: \n" + _productoEmpacado.Dump() + "\nProducto Detalle: \n" +
-                          _productoEmpacado.Producido.Dump() + "\nProducto: \n" + _productoEmpacado.Producido.Producto.Dump() + "\n");
+                          _productoEmpacado.Producido.Dump() + "\nProducto: \n" + _productoEmpacado.Producido.Dump() + "\n");
         if (_productosEmpacadosBLL.Guardar(_productoEmpacado))
         {
             ActualizarExistencia();
@@ -244,12 +265,13 @@
 
     public void ActualizarExistenciaProducido(int? cantidadProducido)
     {
-        _productoEmpacado.Producido = _productosBLL.BuscarProductoDetalle(_pdpProducidoId);
-        if (_productoEmpacado.Producido != null)
+        var producido = _productosBLL.Buscar(_producidoId);
+        if (producido != null)
         {
-            _productoEmpacado.Producido.Cantidad = 1;
-            if (_productoEmpacado.Producido.Producto != null) _productoEmpacado.Producido.Producto.Existencia = cantidadProducido;
-            _productosBLL.Guardar(_productoEmpacado.Producido.Producto);
+            producido.Existencia = cantidadProducido;
+            producido.ValorInventario = (float) (producido.Costo * producido.Existencia);
+            _productoEmpacado.Producido = producido;
+            _productosBLL.Guardar(_productoEmpacado.Producido);
         }
     }
     public void ActualizarExistencia(bool incrementar = false)
@@ -293,7 +315,7 @@
         if (_pdpUtilizadoId != null && _cantidadPdpUtilizado > 0)
         {
 
-        // Busca en el ProductoDetallePresentacion view el producto detalle presentacion utilizado
+    // Busca en el ProductoDetallePresentacion view el producto detalle presentacion utilizado
             var utilizado = _productoDetallesPresentacionList.FirstOrDefault(pdp => pdp.ProductoDetallesId == _pdpUtilizadoId);
             if (utilizado != null)
             {
